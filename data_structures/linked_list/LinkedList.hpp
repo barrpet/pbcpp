@@ -4,16 +4,14 @@
 namespace _LL_Detail
 {
   template <typename T>
-  class _LL_Node
+  struct _LL_Node
   {
-    public:
-      T          data;
-      _LL_Node*  prev;
-      _LL_Node*  next;
-      
-      Node() : prev(nullptr), next(nullptr) {}
-      Node(const T& value) : prev(nullptr), next(nullptr), data(value) {}
-      ~Node() {}
+    T          data;
+    _LL_Node*  prev;
+    _LL_Node*  next;
+    
+    Node() : prev(nullptr), next(nullptr) {}
+    Node(const T& value) : prev(nullptr), next(nullptr), data(value) {}
   };
 }
 
@@ -126,40 +124,50 @@ class LinkedList
     typedef T                               value_type;
     typedef T*                              pointer;
     typedef T&                              reference;
-    
     typedef _LinkedList_Iterator<T>         iterator;
     typedef _LinkedList_Const_Iterator<T>   const_iterator;
-    
     typedef size_t                          size_type;
     
   protected:
     typedef _LinkedList_Detail::_LL_Node    node;
     
+    //Members
+    iterator    tail_;
+    size_type   size_;
+    
     LinkedList() : head_(nullptr), tail_(nullptr), size_(0) { }
     LinkedList(const LinkedList<value_type>&);
+    
+    iterator begin() noexcept;
+    const_iterator begin() noexcept;
+    
+    iterator end() noexcept;
+    const_iterator end() noexcept;
 
     size_t size()   { return size_; }
     size_t count()  { return size_; }
     bool empty()    { return size_ == 0; }
     bool is_empty() { return size_ == 0; }
     
+    void push_front(const T&);
+    void push_back(const T&);
     void insert_front(const T&);
     void insert_back(const T&);
-    
-    void sort();
-    template <class StrictWeakOrdering> void sort(StrictWeakOrdering);
-    
-    void clear() noexcept;
     
     bool pop_front();
     bool pop_back();
     bool remove_front() { return pop_front(); }
     bool remove_back()  { return pop_back(); }
+    
+    void clear() noexcept;
+    
+    void sort();
+    template <class StrictWeakOrdering> void sort(StrictWeakOrdering);
 
-    reference_type peek_front() const;
-    reference_type peek_back() const;
-    reference_type get_front() const { return peek_front(); }
-    reference_type get_back() const { return peek_back(); }
+    reference peek_front() const;
+    reference peek_back() const;
+    reference get_front() const { return peek_front(); }
+    reference get_back() const { return peek_back(); }
 
     bool remove_first_occurrence(const_reference_type);
     bool remove_last_occurrence(const_reference_type);
