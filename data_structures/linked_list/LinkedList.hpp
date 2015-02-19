@@ -1,276 +1,289 @@
 #ifndef PB_LINKED_LIST_HPP
 #define PB_LINKED_LIST_HPP
 
-#include <iostream>
-#include <cstddef>
-#include <vector>
+namespace _LL_Detail
+{
+  template <typename T>
+  class _LL_Node
+  {
+    public:
+      T          data;
+      _LL_Node*  prev;
+      _LL_Node*  next;
+      
+      Node() : prev(nullptr), next(nullptr) {}
+      Node(const T& value) : prev(nullptr), next(nullptr), data(value) {}
+      ~Node() {}
+  };
+}
+
+// A LinkedList::iterator
+template <typename T>
+struct _LinkedList_Iterator
+{
+  typedef _LinkedList_Iterator<T>   _self;
+  typedef _LL_Detail::_LL_Node<T>   _node;
+  
+  typedef T                         value_type;
+  typedef T*                        pointer;
+  typedef T&                        reference;
+  
+  //Only member
+  _node* m_node_;
+  
+  _LinkedList_Iterator() : m_node_() {}
+  _LinkedList_Iterator(_node* x) : m_node_(x) {}
+  
+  reference operator*() const { return m_node_->data; }
+  pointer operator->() const { return &(m_node_->data); }
+  
+  _self& operator++()
+  {
+    m_node_ = m_node_->next;
+    return *this;
+  }
+  
+  _self operator++(int)
+  {
+    _self tmp = *this;
+    m_node_ = m_node_->next;
+    return tmp;
+  }
+  
+  _self& operator--()
+  {
+    m_node_ = m_node_->prev;
+    return *this;
+  }
+  
+  _self operator--(int)
+  {
+    _self tmp = *this;
+    m_node_ = m_node_->prev;
+    return tmp;
+  }
+  
+  bool operator==(const _self& rhs) const { return m_node_ == rhs.m_node_; }
+  bool operator!=(const _self& rhs) const { return m_node_ != rhs.m_node_; }
+};
+
+// A LinkedList::const_iterator
+template <typename T>
+struct _LinkedList_Const_Iterator
+{
+  typedef _LinkedList_Const_Iterator<T>   _self;
+  typedef const _LL_Detail::_LL_Node<T>   _node;
+  typedef _LinkedList_Iterator<T>         iterator;
+  
+  typedef T                               value_type;
+  typedef const T*                        pointer;
+  typedef const T&                        reference;
+  
+  //Only member
+  const _node* m_node_;
+  
+  _LinkedList_Const_Iterator() : m_node_() {}
+  _LinkedList_Const_Iterator(const _node* x) : m_node_(x) {}
+  _LinkedList_Const_Iterator(const iterator& oth) : m_node_(oth.m_node_) {}
+  
+  reference operator*() const { return m_node_->data; }
+  pointer operator->() const { return &(m_node_->data); }
+  
+  _self& operator++()
+  {
+    m_node_ = m_node_->next;
+    return *this;
+  }
+  
+  _self operator++(int)
+  {
+    _self tmp = *this;
+    m_node_ = m_node_->next;
+    return tmp;
+  }
+  
+  _self& operator--()
+  {
+    m_node_ = m_node_->prev;
+    return *this;
+  }
+  
+  _self operator--(int)
+  {
+    _self tmp = *this;
+    m_node_ = m_node_->prev;
+    return tmp;
+  }
+  
+  bool operator==(const _self& rhs) const { return m_node_ == rhs.m_node_; }
+  bool operator!=(const _self& rhs) const { return m_node_ != rhs.m_node_; }
+};
 
 template <typename T>
 class LinkedList
 {
-  private:
-    class Node
-    {
-      public:
-        T         data;
-        Node*     next;
-        Node*     prev;
-
-        Node() : next(NULL), prev(NULL) { }
-        Node(const T& value) : data(value), next(NULL), prev(NULL) { }
-    };
+  public:
+    typedef T                               value_type;
+    typedef T*                              pointer;
+    typedef T&                              reference;
     
-    private:
-        Node*       _head;
-        Node*       _tail;
-        size_t      _size;
+    typedef _LinkedList_Iterator<T>         iterator;
+    typedef _LinkedList_Const_Iterator<T>   const_iterator;
     
-    public:
-        LinkedList() : _head(NULL), _tail(NULL), _size(0) { }
-        LinkedList(const LinkedList<T>&);
+    typedef size_t                          size_type;
+    
+  protected:
+    typedef _LinkedList_Detail::_LL_Node    node;
+    
+    LinkedList() : head_(nullptr), tail_(nullptr), size_(0) { }
+    LinkedList(const LinkedList<value_type>&);
 
-        size_t size() { return this->_size; }
-        bool isEmpty() { return this->_size == 0; }
-        
-        void insertFront(const T&); //done
-        void insertBack(const T&);  //done
-        
-        void clear();   //done
-        
-        T& popFront();  //done
-        T& popBack();   //done
+    size_t size()   { return size_; }
+    size_t count()  { return size_; }
+    bool empty()    { return size_ == 0; }
+    bool is_empty() { return size_ == 0; }
+    
+    void insert_front(const T&);
+    void insert_back(const T&);
+    
+    void sort();
+    template <class StrictWeakOrdering> void sort(StrictWeakOrdering);
+    
+    void clear() noexcept;
+    
+    bool pop_front();
+    bool pop_back();
+    bool remove_front() { return pop_front(); }
+    bool remove_back()  { return pop_back(); }
 
-        T& peekFront() { return this->_head->data; }
-        T& peekBack() { return this->_tail->data; }
+    reference_type peek_front() const;
+    reference_type peek_back() const;
+    reference_type get_front() const { return peek_front(); }
+    reference_type get_back() const { return peek_back(); }
 
-        bool removeFront(); //done
-        bool removeBack();  //done
-
-        bool removeFirstOccurrence(const T&);   //done
-        bool removeLastOccurrence(const T&);    //done
-
-        T getAt(size_t);
-        
-        bool contains(const T&) //done
-
-        std::vector<T> toVector();
-        
-        void printList();
-        
-        friend std::ostream& operator<<(std::ostream& out, const LinkedList<T>& list);
+    bool remove_first_occurrence(const_reference_type);
+    bool remove_last_occurrence(const_reference_type);
+    
+    bool contains(const_reference_type) const;
 };
 
 template <typename T>
 LinkedList<T>::LinkedList(const LinkedList<T>& toCopy)
 {
-    if(this == &toCopy) { return; }
-    
-    if(toCopy.isEmpty())
-    {
-        this->_head = NULL;
-        this->_tail = NULL;
-        this->_size = 0;
-        return;
-    }
 
-    //TODO: copy the linked list
 }
 
 template <typename T>
 LinkedList<T>::~LinkedList()
 {
-    this->clear();
+  clear();
 }
 
 template <typename T>
-void LinkedList<T>::insertFront(const T& value)
+void LinkedList<T>::insert_front(const T& value)
 {
-    Node* newNode = new Node(value);
-    if(this->isEmpty())
-    {
-        this->_head = newNode;
-        this->_tail = newNode;
-    }
-    else
-    {
-        newNode->next = this->_head;
-        this->_head->prev = newNode;
-        this->_head = newNode;
-    }
-    this->_size++;
+  Node<T>* ins = new Node(value);
+  if(is_empty())
+  {
+    head_ = ins;
+    tail_ = head_;
+  }
+  else
+  {
+    ins->next = head_;
+    head_->prev = ins;
+    head_ = ins;
+  }
+  size_++;
 }
 
 template <typename T>
-void LinkedList<T>::insertBack(const T& value)
+void LinkedList<T>::insert_back(const T& value)
 {
-    Node* newNode = new Node(value);
-    if(this->isEmpty())
-    {
-        this->_head = newNode;
-        this->_tail = newNode;
-    }
-    else
-    {
-        newNode->prev = this->_tail;
-        this->_tail->next = newNode;
-        this->_tail = newNode;
-    }
-    this->_size++;
+  Node<T>* ins = new Node(value);
+  if(is_empty())
+  {
+    head_ = ins;
+    tail_ = head_;
+  }
+  else
+  {
+    tail_->next = ins;
+    ins->prev = tail_;
+    tail_ = ins;
+  }
+  size_++;
 }
 
 template <typename T>
 void LinkedList<T>::clear()
 {
-    Node* current = this->_head;
-    Node* temp = this->_head;
-    
-    while(current != NULL)
-    {
-        temp = current->next;
-        delete current;
-        current = temp;
-    }
-    
-    this->_head = NULL;
-    this->_tail = NULL;
-    this->_size = 0;
+  Node<T>* cur = head_;
+  while(cur != nullptr)
+  {
+    Node<T>* next = cur->next;
+    delete cur;
+    cur = next;
+  }
+  head_ = nullptr;
+  tail_ = nullptr;
+  size_ = 0;
 }
 
 template <typename T>
-void LinkedList<T>::contains(const T& value)
+bool LinkedList<T>::contains(const T& value)
 {
-    Node* current = this->_head;
-    while(current != NULL)
-    {
-        if(current->data == value)
-        {
-            return true;
-        }
-        current = current->next;
-    }
+  node_pointer cur = head_;
+  
+  while(cur != nullptr)
+  {
+    if(cur->value == value)
+      return true;
+    cur = cur->next;
+  }
+  return false;
+}
+
+template <typename T>
+bool LinkedList<T>::remove_first_occurrence(const T& value)
+{
+
+}
+
+template <typename T>
+bool LinkedList<T>::remove_last_occurrence(const T& value)
+{
+
+}
+
+template <typename T>
+bool LinkedList<T>::pop_front()
+{
+  if(is_empty())
     return false;
+  
+  return true;
 }
 
 template <typename T>
-bool LinkedList<T>::removeFront()
+bool LinkedList<T>::pop_back()
 {
-    if(this->isEmpty()) { return false; }
-    if(this->_size == 1)
-    {
-        this->clear();
-        return true;
-    }
-
-    Node* oldFront = this->_head;
-    Node* newFront = this->_head->next;
-    newFront->prev = NULL;
-    this->_head = newFront;
-    delete oldFront;
-    this->_size--;
-    return true;
-}
-
-template <typename T>
-bool LinkedList<T>::removeBack()
-{
-    if(this->isEmpty()) { return false; }
-    if(this->_size == 1)
-    {
-        this->clear();
-        return true;
-    }
-
-    Node* oldBack = this->_tail;
-    Node* newBack = this->_tail->prev;
-    newBack->next = NULL;
-    this->_tail = newBack;
-    delete oldBack;
-    this->_size--;
-    return true;
-}
-
-template <typename T>
-bool LinkedList<T>::removeFirstOccurrence(const T& value)
-{
-    if(this->isEmpty()) { return false; }
-
-    Node* current = this->_head;
-    while(current != NULL)
-    {
-        if(current->data == value)
-        {
-            if(current == this->_head)
-            {
-                return this->removeFront();
-            }
-            else if(current == this->_tail)
-            {
-                return this->removeBack();
-            }
-            else
-            {
-                Node* cur_next = current->next;
-                Node* cur_prev = current->prev;
-                cur_prev->next = cur_next;
-                cur_next->prev = cur_prev;
-                delete current;
-                this->_size--;
-                return true;
-            }
-        }
-        current = current->next;
-    }
+  if(is_empty())
     return false;
+  
+  return true;
 }
 
 template <typename T>
-bool LinkedList<T>::removeLastOccurrence(const T& value)
+void LinkedList<T>::sort()
 {
-    if(this->isEmpty()) { return false; }
 
-    Node* current = this->_tail;
-    while(current != NULL)
-    {
-        if(current->data == value)
-        {
-            if(current == this->_head)
-            {
-                return this->removeFront();
-            }
-            else if(current == this->_tail)
-            {
-                return this->removeBack();
-            }
-            else
-            {
-                cur_next = current->next;
-                cur_prev = current->prev;
-                cur_prev->next = cur_next;
-                cur_next->prev = cur_prev;
-                delete current;
-                this->_size--;
-                return true;
-            }
-        }
-        current = current->prev;
-    }
-    return false;
 }
 
-template <typename T>
-T& LinkedList<T>::popFront()
+template <typename T> template <class StrictWeakOrdering>
+void LinkedList<T>::sort(StrictWeakOrdering comp)
 {
-    T ret = this->_head->data;
-    this->removeFront();
-    return ret;
-}
-
-template <typename T>
-T& LinkedList<T>::popBack()
-{
-    T ret = this->_tail->data;
-    this->removeBack();
-    return ret;
+  
 }
 
 #endif  //PB_LINKED_LIST_HPP
