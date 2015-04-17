@@ -50,7 +50,8 @@ namespace pbmath
   }
   
   template <class int_type, class ret_type = unsigned long long>
-  ret_type mul_mod(int_type a, int_type b, int_type mod) {
+  ret_type mul_mod(int_type a, int_type b, int_type mod)
+  {
     unsigned long long x = 0;
     unsigned long long y = a % mod;
     while(b > 0)
