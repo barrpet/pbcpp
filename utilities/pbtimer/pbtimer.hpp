@@ -1,38 +1,45 @@
 #ifndef PB_TIMER_HPP
 #define PB_TIMER_HPP
 
-#include <chrono>
-#include <ratio>
+//Check for C++11
+#if __cplusplus <= 199711L
+  #include <cstddef>
+  #include <sys/time.h>
+#else
+  #define PB_CPP11
+  #include <chrono>
+  #include <ratio>
+#endif
 
 class Timer
 {
-  using namespace std::chrono;
-  typedef high_resolution_clock hr_clock;
-  
-  
   private:
-    hr_clock::time_point    tp_start;
-    hr_clock::time_point    tp_stop;
-    bool                    running;
+    #ifdef PB_CPP11
+    using namespace std::chrono;
+    high_resolution_clock::time_point    tp_start;
+    high_resolution_clock::time_point    tp_stop;
+    #else
+    struct timeval                       tp_start;
+    struct timeval                       tp_stop;
+    #endif
+    bool                                 running;
   
   public:
     Timer() : is_running(false) { }
+    ~Timer() { }
     
-    void start() {
-      tp_start = hr_clock::now();
-    }
+    bool is_running() const { return running; }
     
-    void stop() {
-      tp_stop = hr_clock::now();
-      running = false;
-    }
+    
+    void start();
+    void stop();
+    void reset();
+    double elapsed_sec() const;
     
     void reset() {
       running = false;
       tp_stop = tp_start;
     }
-    
-    bool is_running() { return running; }
     
     double elapsed_sec() const {
       if(running) {
@@ -41,8 +48,64 @@ class Timer
         return duration_cast<duration<double>>(tp_stop - tp_start).count();
       }
     }
-    
-    unsigned long elapsed_usec() const;
 };
 
+Timer::Timer() : is_running(false)
+{
+
+}
+
+Timer::~Timer()
+{
+
+}
+
+#ifdef PB_CPP11 //C++11 Implementation
+void Timer::start()
+{
+  tp_start = high_resolution_clock::now();
+  running = true;
+}
+
+void Timer::stop()
+{
+  tp_stop = high_resolution_clock::now();
+  running = false;
+}
+
+void Timer::reset()
+{
+
+}
+
+double Timer::elapsed_sec() const
+{
+  if(running)
+    return duration_cast<duration<double>>(high_resolution_clock::now() - tp_start).count();
+  else
+    return duration_cast<duration<double>>(tp_stop - tp_start).count();
+}
+#undef PB_CPP11
+#else //C++ <= 98 Implementation
+void Timer::start()
+{
+
+}
+
+void Timer::stop()
+{
+
+}
+
+void Timer::reset()
+{
+
+}
+
+double Timer::elapsed_sec() const
+{
+  return 0.0L;`
+}
 #endif
+
+#endif  //PB_TIMER_HPP
