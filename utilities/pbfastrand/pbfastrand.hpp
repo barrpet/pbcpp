@@ -5,6 +5,10 @@
 #include <cstdint>
 #include <cmath>
 
+//Check for uint64_t, work with 32 bit if not
+#ifdef UINT64_MAX
+
+#define STATE_SIZE 16
 /* 16 Random 64-bit unsigned ints from Random.org
  * https://xkcd.com/221/  */
 #define RAND_SEED \
@@ -24,11 +28,17 @@
 0x1f9bf4c0ac86d9d8, \
 0x6edb83c3ed843533
 
+#else
+//TODO: what to do if no 64 bit
+#endif
+
+
+
 class pbfastrand
 {
   private:
     //State infomation
-    uint64_t state[16]{RAND_SEED};
+    uint64_t state[STATE_SIZE]{RAND_SEED};
     unsigned p = 0;
     
     //For generating normal
@@ -60,7 +70,7 @@ class pbfastrand
       uint64_t s =
         std::chrono::duration_cast<std::chrono::milliseconds>
         (std::chrono::system_clock::now().time_since_epoch()).count();
-      for(auto i = 0; i < 16; i++)
+      for(auto i = 0; i < STATE_SIZE; i++)
       {
         s ^= s >> 12;
         s ^= s << 25;
@@ -70,10 +80,10 @@ class pbfastrand
     }
     
     //Seed using an array of 64 bit unsigned ints
-    //If n > 16, we just take the first 16
+    //If n > STATE_SIZE, we just take the first STATE_SIZE
     void seed(uint64_t* seed_arr, size_t n)
     {
-      size_t len = (n < 16) ? n : 16;
+      size_t len = (n < STATE_SIZE) ? n : STATE_SIZE;
       for(unsigned i = 0; i < len; i++)
         state[i] = seed_arr[i];
     }
@@ -128,12 +138,17 @@ class pbfastrand
     }
     
     //Generate a uniformly distributed random double in [0,1]
-    double gen_unif()
+    inline double gen_unif()
     {
-      uint64_t rand64 = gen_uint64();
-      return (double)rand64 * (1.0L / UINT64_MAX);
+      return (double)gen() * (1.0L / (double)UINT64_MAX);
     }
     
+    //Generate a uniformly distributed random double in [min,max]
+    //NOTE: don't combine with default, save some instructions for [0,1]
+    double gen_unif(double min, double max)
+    {
+      return ((max-min) * gen_unif()) + min;
+    }
     
     //Generate a normally distributed random double
     double gen_norm(double mu = 0.0L, double sigma = 1.0L)
