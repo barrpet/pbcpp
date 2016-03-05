@@ -1,0 +1,9 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+
+Name: pbcpp
+Description: A C++11 template library with various uses
+Requires:
+Version: @PBCPP_VERSION_NUMBER@
+Libs:
+Cflags: -I${prefix}/@INCLUDE_INSTALL_DIR@

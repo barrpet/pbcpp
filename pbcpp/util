@@ -1,0 +1,11 @@
+#ifndef PBCPP_UTIL_MODULE
+#define PBCPP_UTIL_MODULE
+
+//include core first
+#include "core"
+
+#include "fastrand"
+#include "timer"
+#include "math"
+
+#endif //PBCPP_UTIL_MODULE
