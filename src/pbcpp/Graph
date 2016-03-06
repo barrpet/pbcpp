@@ -1,0 +1,7 @@
+#ifndef PBCPP_GRAPH_MODULE
+#define PBCPP_GRAPH_MODULE
+
+#include "src/Graph/Graph.hpp"
+#include "src/Graph/AdjacencyArray.hpp"
+
+#endif //PBCPP_GRAPH_MODULE
