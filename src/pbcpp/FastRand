@@ -1,0 +1,7 @@
+#ifndef PBCPP_FASTRAND_MODULE
+#define PBCPP_FASTRAND_MODULE
+
+#include "src/FastRand/FastRand.hpp"
+#include "src/FastRand/Distribution.hpp"
+
+#endif //PBCPP_FASTRAND_MODULE

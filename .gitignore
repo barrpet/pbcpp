@@ -28,6 +28,6 @@
 *.app
 
 # Build directories
-*/build/
-*/release/
-*/debug/
+*build/
+*release/
+*debug/

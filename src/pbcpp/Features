@@ -1,0 +1,7 @@
+#ifndef PBCPP_FEATURES_MODULE
+#define PBCPP_FEATURES_MODULE
+
+#include "src/Features/Os.hpp"
+#include "src/Features/Compiler.hpp"
+
+#endif //PBCPP_FEATURES_MODULE

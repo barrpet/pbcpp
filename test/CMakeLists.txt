@@ -1,7 +1,7 @@
 project(pbcpp CXX)
 cmake_minimum_required(VERSION 2.8.5)
 
-include_directories(../)
+include_directories(../src)
 
 file(GLOB PBCPP_TEST_SOURCES "*.cpp")
 

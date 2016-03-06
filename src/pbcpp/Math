@@ -1,7 +1,7 @@
 #ifndef PBCPP_MATH_MODULE
 #define PBCPP_MATH_MODULE
 
-#include "src/util/math/constants.hpp"
-#include "src/util/math/math.hpp"
+#include "src/Math/Constants.hpp"
+#include "src/Math/Math.hpp"
 
 #endif //PBCPP_MATH_MODULE

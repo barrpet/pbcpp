@@ -1,0 +1,4 @@
+project(pbcpp CXX)
+
+install(DIRECTORY pbcpp
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
