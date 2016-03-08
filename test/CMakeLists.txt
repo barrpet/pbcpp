@@ -16,6 +16,7 @@ endif()
 
 add_executable(unit_tests 
   test_math.cpp
+  test_datetimematch.cpp
   unit_tests.cpp)
 
 set_target_properties(unit_tests
